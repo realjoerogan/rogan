@@ -9,7 +9,6 @@ music = DiscordUtils.Music()
 import logging
 import random
 import requests
-import schedule
 bot = commands.Bot(command_prefix = '.')
 
 
