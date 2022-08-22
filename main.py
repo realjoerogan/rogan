@@ -65,12 +65,16 @@ async def gsi():
             if "name" in data['map']['team_t'].keys():
                 t_name = data['map']['team_t']['name']
             else:
-                ct_name = "T's"
+                t_name = "T's"
+            map_name = data['map']['name']
+            for guild in bot.guilds:
+                if guild.me.nick != (f"live on {map_name}"):
+                    await guild.me.edit(nick=f"live on {map_name}")
             await bot.change_presence(activity=discord.Game(name=(f"{ct_name} {ct_score} - {t_score} {t_name}")))
         else:
-            print("no map data")
+            print("no map")
     else:
-        print("no map data")
+        print("bad gateway")
 
 
 @bot.command()
