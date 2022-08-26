@@ -9,7 +9,7 @@ music = DiscordUtils.Music()
 import logging
 import random
 import requests
-bot = commands.Bot(command_prefix = '.')
+bot = commands.Bot(command_prefix='.')
 
 
 global symbol1
@@ -18,6 +18,11 @@ global name1
 global name2
 global turn
 turn = 0
+
+matchEnd = 0
+t_name2 = "T's"
+ct_name2 = "CT's"
+
 
 logger = logging.getLogger(__name__)
 
@@ -44,13 +49,19 @@ client = discord.Client(intents=intents)
 
 @bot.event
 async def on_ready():
+    for guild in bot.guilds:
+        await guild.me.edit(nick=f"")
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=("No Active Matches")))
     logger.warning(f"BotLaunched::")
     gsi.start()
 
 
-@tasks.loop(seconds = 1)
+@tasks.loop(seconds=1)
 async def gsi():
+    global matchEnd
+    global t_name2
+    global ct_name2
+
     x = requests.get('http://127.0.0.1:3000')
     if x.status_code == 200:
         data = x.json()
@@ -70,10 +81,31 @@ async def gsi():
                 if guild.me.nick != (f"live on {map_name}"):
                     await guild.me.edit(nick=f"live on {map_name}")
             await bot.change_presence(activity=discord.Game(name=(f"{ct_name} {ct_score} - {t_score} {t_name}")))
+            if "phase" in data['map'].keys():
+                gamePhase = data['map']['phase']
+                if gamePhase == "gameover":
+                    if matchEnd == 0:
+                        matchEnd = 1
+                        print("game over")
+                        for guild in bot.guilds:
+                            scoreChannel = discord.utils.get(guild.channels, name="match-results")
+                            if not scoreChannel:
+                                scoreChannel = await guild.create_text_channel(name="match-results")
+                            channel = bot.get_channel(scoreChannel.id)
+                            embed = discord.Embed(
+                                title=(f"{ct_name.replace(ct_name2, 'counter terrorists')} {ct_score} - {t_score} {t_name.replace(t_name2, 'prob terrorists idk')}"),
+                                timestamp=datetime.now().astimezone(pytz.timezone('US/Eastern'))
+                            )
+                            await channel.send(embed=embed)
+
+
         else:
             print("no map")
+            matchEnd = 0
     else:
-        print("bad gateway")
+        print("no map")
+        matchEnd = 0
+
 
 
 @bot.command()
@@ -215,5 +247,3 @@ async def tempmute(ctx, member: discord.Member, timed: DurationConverter, *, rea
     await ctx.send(embed=embed)
 
 bot.run(token)
-
-
