@@ -51,12 +51,12 @@ client = discord.Client(intents=intents)
 async def on_ready():
     for guild in bot.guilds:
         await guild.me.edit(nick=f"")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=("No Active Matches")))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="No Active Matches"))
     logger.warning(f"BotLaunched::")
     gsi.start()
 
 
-@tasks.loop(seconds=1)
+@tasks.loop(seconds=3)
 async def gsi():
     global matchEnd
     global t_name2
@@ -78,9 +78,21 @@ async def gsi():
                 t_name = "T's"
             map_name = data['map']['name']
             for guild in bot.guilds:
-                if guild.me.nick != (f"live on {map_name}"):
-                    await guild.me.edit(nick=f"live on {map_name}")
-            await bot.change_presence(activity=discord.Game(name=(f"{ct_name} {ct_score} - {t_score} {t_name}")))
+                if "round" in data.keys():
+                    if "bomb" in data['round'].keys():
+                        if data['round']['bomb'] == "planted":
+                            if guild.me.nick != f"bomb planted on {map_name}":
+                                await guild.me.edit(nick=f"bomb planted on {map_name}")
+                        if data['round']['bomb'] == "defused":
+                            if guild.me.nick != f"bomb defused on {map_name}":
+                                await guild.me.edit(nick=f"bomb defused on {map_name}")
+                        if data['round']['bomb'] == "exploded":
+                            if guild.me.nick != f"bomb exploded on {map_name}":
+                                await guild.me.edit(nick=f"bomb exploded on {map_name}")
+                else:
+                    if guild.me.nick != f"live on {map_name}":
+                        await guild.me.edit(nick=f"live on {map_name}")
+            await bot.change_presence(activity=discord.Game(name=f"{ct_name} {ct_score} - {t_score} {t_name}"))
             if "phase" in data['map'].keys():
                 gamePhase = data['map']['phase']
                 if gamePhase == "gameover":
@@ -93,7 +105,7 @@ async def gsi():
                                 scoreChannel = await guild.create_text_channel(name="match-results")
                             channel = bot.get_channel(scoreChannel.id)
                             embed = discord.Embed(
-                                title=(f"{ct_name.replace(ct_name2, 'counter terrorists')} {ct_score} - {t_score} {t_name.replace(t_name2, 'prob terrorists idk')}"),
+                                title=f"{ct_name.replace(ct_name2, 'counter terrorists')} {ct_score} - {t_score} {t_name.replace(t_name2, 'prob terrorists idk')}",
                                 timestamp=datetime.now().astimezone(pytz.timezone('US/Eastern'))
                             )
                             await channel.send(embed=embed)
@@ -104,6 +116,10 @@ async def gsi():
             matchEnd = 0
     else:
         print("no map")
+        for guild in bot.guilds:
+            if guild.me.nick != (f""):
+                await guild.me.edit(nick=f"")
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=("No Active Matches")))
         matchEnd = 0
 
 
@@ -247,3 +263,4 @@ async def tempmute(ctx, member: discord.Member, timed: DurationConverter, *, rea
     await ctx.send(embed=embed)
 
 bot.run(token)
+
