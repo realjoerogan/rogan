@@ -55,13 +55,6 @@ client = discord.Client(intents=intents)
 
 @bot.event
 async def on_ready():
-    # channel = bot.get_channel(1014279089022062612)
-    # embed = discord.Embed(
-    #     title=f"update: v0.9.8",
-    #     description=f"**whats new?**\nsupport for multiple game state integrations has been added, this means that anyone running the gsi in their config directly will have their matches processed through the bot. whoever starts their match first will have their match displayed in the nickname and status, and once the match ends/they leave the match that was second in the que will replace it.\n**what this this mean for my existing gsi?**\nnothing! i specifically wrote this all in a way that the game state integration itself isnt affected, there are no available updates for the gsi.\n**does this mean you can see all my data?**\nof course not! the only non-cs related thing i can view is your steamid64 (which you can find by going to someones profile)\n**ok but why should i care?**\nthe round data being collected from this (rounds won/lost, equipment cost, etc) is being fed into a maching learning algorithm that tries to calculate the chance that a team will win a round. even though csgo already does this, all it does is divide the equipment costs of both teams, while this accounts for how many rounds this team previously won with a similar equipment cost.\n**how do i join?**\nits really easy, just go to https://github.com/realjoerogan/rogangsi and click the green code button and press download zip. unzip it using 7zip or any alternatives and put .cfg file located in the unzipped folder into the cfg directory of your cs installation.",
-    #     timestamp=datetime.now().astimezone(pytz.timezone('US/Eastern'))
-    # )
-    # await channel.send(embed=embed)
     for guild in bot.guilds:
         await guild.me.edit(nick=f"")
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="No Active Matches"))
