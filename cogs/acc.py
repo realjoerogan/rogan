@@ -23,8 +23,8 @@ third_overall = ""
 track_name = ""
 
 aws_region = 'us-east-1'
-key = 'AKIAXKJBRD7GJZPZXWG3'
-secret = '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'
+key = ''
+secret = ''
 
 
 class acc(commands.Cog):
