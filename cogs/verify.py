@@ -21,7 +21,7 @@ class verify(commands.Cog):
 
     @commands.command()
     async def verify(self, ctx):
-        embed = discord.Embed(title="Hey There!", description="React below to verify your account.", color=0xFFFFFF)
+        embed = discord.Embed(title="generic title", description="click the thing", color=0xFFFFFF)
 
         sent = await ctx.send(embed=embed)
         await sent.add_reaction("<:hobbes:1032795437113024532>")
